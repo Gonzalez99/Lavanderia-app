@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gestión de Tickets - Lavandería</title>
+    <link rel="stylesheet" href="clients.css">
+</head>
+<body>
+
+    <!-- CABECERA FIJA SUPERIOR IZQUIERDA -->
+    <header class="cabecera-fija">
+        <div class="num-ticket-badge" id="badgeNumTicket">Ticket #1</div>
+        <h2>Recepción de Pedido</h2>
+    </header>
+
+    <!-- CONTENEDOR DEL ASISTENTE PASO A PASO -->
+    <main class="contenedor-asistente">
+        <form id="formularioTicket">
+
+            <!-- PASO 1: SELECCIÓN DE DÍA CON CALENDARIO -->
+            <section class="paso-pantalla activo" id="paso1">
+                <h3 class="titulo-paso">Paso 1: Fecha de Entrega</h3>
+                
+                <div class="campo">
+                    <label for="fechaEntrega">Seleccione el día en el calendario:</label>
+                    <!-- Al hacer clic se despliega el calendario completo del sistema/navegador -->
+                    <input type="date" id="fechaEntrega" class="input-calendario" onchange="alCambiarFecha()">
+                </div>
+                <div class="campo" style="margin-top: 15px;">
+                    <button type="button" onclick="reiniciarContadorTicket()" style="background: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem;">
+                        🔄 Reiniciar contador de tickets a #1
+                    </button>
+                </div>
+
+                <div class="botones-navegacion">
+                    <div></div>
+                    <button type="button" class="btn-nav btn-siguiente" onclick="siguientePaso(2)">Siguiente ➔</button>
+                </div>
+            </section>
+
+            <!-- PASO 2: HORA DE ENTREGA (PARRILLA CON CAPACIDAD Y HORA MANUAL) -->
+            <section class="paso-pantalla" id="paso2">
+                <h3 class="titulo-paso">Paso 2: Hora de Entrega</h3>
+                <p>Seleccione una franja horaria disponible (se indica el total de lavados ya asignados):</p>
+
+                <!-- Parrilla de horas comercial -->
+                <div class="grid-horas" id="parrillaHoras">
+                    <!-- Los botones se generan / actualizan dinámicamente con JS para reflejar la ocupación -->
+                </div>
+
+                <!-- Campo de Hora Personalizada -->
+                <div class="bloque-hora-manual">
+                    <label for="horaManual">O introduce una hora específica a mano:</label>
+                    <input type="time" id="horaManual" class="input-estandar" onchange="seleccionarHoraManual()">
+                </div>
+
+                <div class="botones-navegacion">
+                    <button type="button" class="btn-nav btn-anterior" onclick="siguientePaso(1)">⬅ Anterior</button>
+                    <button type="button" class="btn-nav btn-siguiente" onclick="siguientePaso(3)">Siguiente ➔</button>
+                </div>
+            </section>
+
+            <!-- PASO 3: TEMPERATURA DE LAVADO -->
+            <section class="paso-pantalla" id="paso3">
+                <h3 class="titulo-paso">Paso 3: Seleccionar Temperatura</h3>
+                
+                <div class="grid-temperaturas">
+                    <button type="button" class="btn-opcion seleccionado" onclick="seleccionarTemperatura('30 ºC', this)">30 ºC</button>
+                    <button type="button" class="btn-opcion" onclick="seleccionarTemperatura('40 ºC', this)">40 ºC</button>
+                    <button type="button" class="btn-opcion" onclick="seleccionarTemperatura('50 ºC', this)">50 ºC</button>
+                    <button type="button" class="btn-opcion" onclick="seleccionarTemperatura('60 ºC', this)">60 ºC</button>
+                </div>
+
+                <div class="botones-navegacion">
+                    <button type="button" class="btn-nav btn-anterior" onclick="siguientePaso(2)">⬅ Anterior</button>
+                    <button type="button" class="btn-nav btn-siguiente" onclick="siguientePaso(4)">Siguiente ➔</button>
+                </div>
+            </section>
+
+            <!-- PASO 4: TIPO DE ROPA Y SECADO -->
+            <section class="paso-pantalla" id="paso4">
+                <h3 class="titulo-paso">Paso 4: Ropa y Secado</h3>
+                
+                <h4>Tipo de Ropa:</h4>
+                <div class="grupo-botones-grandes">
+                    <button type="button" class="btn-opcion seleccionado" id="btnColor" onclick="seleccionarTipoRopa('Color')">🎨 Color</button>
+                    <button type="button" class="btn-opcion" id="btnBlanca" onclick="seleccionarTipoRopa('Blanca')">⚪ Blanca</button>
+                </div>
+
+                <h4 style="margin-top: 15px;">¿Requiere Secado?</h4>
+                <div class="grupo-botones-grandes">
+                    <button type="button" class="btn-opcion seleccionado" id="btnSecadoNo" onclick="seleccionarSecado('NO')">❌ NO (Solo Lavado + Doblado)</button>
+                    <button type="button" class="btn-opcion" id="btnSecadoSi" onclick="seleccionarSecado('SÍ')">🔥 SÍ (+ Secado)</button>
+                </div>
+
+                <div class="botones-navegacion">
+                    <button type="button" class="btn-nav btn-anterior" onclick="siguientePaso(3)">⬅ Anterior</button>
+                    <button type="button" class="btn-nav btn-siguiente" onclick="siguientePaso(5)">Revisar Pedido ➔</button>
+                </div>
+            </section>
+
+            <!-- PASO 5: REVISIÓN GLOBAL E IMPRESIÓN -->
+            <section class="paso-pantalla" id="paso5">
+                <h3 class="titulo-paso">Paso 5: Resumen del Ticket</h3>
+                
+                <div class="resumen-ticket">
+                    <div class="fila-resumen"><span>Número de Ticket:</span> <strong id="resNum">#1</strong></div>
+                    <div class="fila-resumen"><span>Fecha Recepción:</span> <span id="resFechaRec">-</span></div>
+                    <div class="fila-resumen"><span>Día de Recogida:</span> <strong id="resFechaEntrega">-</strong></div>
+                    <div class="fila-resumen"><span>Hora Estimada:</span> <strong id="resHoraEntrega">-</strong></div>
+                    <div class="fila-resumen"><span>Tipo de Ropa:</span> <span id="resRopa">Color</span></div>
+                    <div class="fila-resumen"><span>Temperatura:</span> <span id="resTemp">30 ºC</span></div>
+                    <div class="fila-resumen"><span>Servicio Secado:</span> <span id="resSecado">NO</span></div>
+                </div>
+
+                <button type="button" class="btn-imprimir-final" onclick="imprimirTickets()">🖨️ IMPRIMIR DOS TICKETS</button>
+
+                <div class="botones-navegacion">
+                    <button type="button" class="btn-nav btn-anterior" onclick="siguientePaso(4)">⬅ Modificar Datos</button>
+                </div>
+            </section>
+
+        </form>
+    </main>
+
+    <!-- SECCIÓN OCULTA EN PANTALLA (SOLO PARA IMPRESORA TÉRMICA) -->
+    <div class="seccion-tickets">
+        
+        <!-- TICKET 1: CLIENTE -->
+        <article class="ticket-termico">
+            <header class="cabecera-ticket">
+                <h1>LAVANDERÍA</h1>
+                <p class="etiqueta-copia">--- TICKET CLIENTE ---</p>
+            </header>
+            <div class="linea-ticket"><span>TICKET Nº:</span> <strong class="lblNum">#1</strong></div>
+            <div class="linea-ticket"><span>Recepción:</span> <span class="lblRec">DD-MM-AAAA HH:MM</span></div>
+            <hr class="separador">
+            <div class="linea-destacada"><span>RECOGIDA:</span> <strong class="lblFEntrega">DD-MM-AAAA</strong></div>
+            <div class="linea-destacada"><span>HORA ESTIMADA:</span> <strong class="lblHEntrega">HH:MM</strong></div>
+            <hr class="separador">
+            <div class="linea-ticket"><span>Tipo Ropa:</span> <span class="lblRopa">Color</span></div>
+            <div class="linea-ticket"><span>Temperatura:</span> <span class="lblTemp">30 ºC</span></div>
+            <div class="linea-ticket"><span>Secado:</span> <span class="lblSecado">NO</span></div>
+            <hr class="separador">
+            <footer class="pie-ticket">
+                <p>¡Gracias por su confianza!</p>
+                <p>Conserve este ticket para la recogida.</p>
+            </footer>
+        </article>
+
+        <!-- TICKET 2: LOCAL -->
+        <article class="ticket-termico">
+            <header class="cabecera-ticket">
+                <h1>LAVANDERÍA</h1>
+                <p class="etiqueta-copia">--- TICKET LOCAL ---</p>
+            </header>
+            <div class="linea-ticket"><span>TICKET Nº:</span> <strong class="lblNum">#1</strong></div>
+            <div class="linea-ticket"><span>Recepción:</span> <span class="lblRec">DD-MM-AAAA HH:MM</span></div>
+            <hr class="separador">
+            <div class="linea-destacada"><span>RECOGIDA:</span> <strong class="lblFEntrega">DD-MM-AAAA</strong></div>
+            <div class="linea-destacada"><span>HORA ESTIMADA:</span> <strong class="lblHEntrega">HH:MM</strong></div>
+            <hr class="separador">
+            <div class="linea-ticket"><span>Tipo Ropa:</span> <span class="lblRopa">Color</span></div>
+            <div class="linea-ticket"><span>Temperatura:</span> <span class="lblTemp">30 ºC</span></div>
+            <div class="linea-ticket"><span>Secado:</span> <span class="lblSecado">NO</span></div>
+            <hr class="separador">
+            <footer class="pie-ticket">
+                <p>COPIA PARA CONTROL INTERNO</p>
+            </footer>
+        </article>
+
+    </div>
+
+    <script src="clients.js"></script>
+</body>
+</html>

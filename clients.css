@@ -1,0 +1,354 @@
+/* ==========================================
+   1. ESTILOS GENERALES Y RESET
+   ========================================== */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+body {
+    background-color: #f0f2f5;
+    color: #1a1a1a;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+/* ==========================================
+   2. CABECERA PERMANENTE (Ticket # superior izq)
+   ========================================== */
+.cabecera-fija {
+    width: 100%;
+    max-width: 700px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 10px 15px;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.num-ticket-badge {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #2b580c; /* Verde lavandería */
+    background: #eaf4e0;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid #c2e2a3;
+}
+
+/* ==========================================
+   3. CONTENEDOR PRINCIPAL DEL ASISTENTE
+   ========================================== */
+.contenedor-asistente {
+    width: 100%;
+    max-width: 700px;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+/* Pasos/Pantallas (Por defecto ocultas menos la activa) */
+.paso-pantalla {
+    display: none; /* Se activará con JS mediante la clase .activo */
+    flex-direction: column;
+    gap: 20px;
+}
+
+.paso-pantalla.activo {
+    display: flex;
+}
+
+.titulo-paso {
+    font-size: 1.4rem;
+    color: #2c3e50;
+    border-bottom: 2px solid #eef2f5;
+    padding-bottom: 10px;
+}
+
+/* ==========================================
+   4. ESTILO DEL CALENDARIO DE SELECCIÓN
+   ========================================== */
+.input-calendario {
+    width: 100%;
+    padding: 16px 20px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #2b580c;
+    background-color: #ffffff;
+    border: 2px solid #2b580c;
+    border-radius: 10px;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.input-calendario:hover, .input-calendario:focus {
+    background-color: #f4f9f0;
+    border-color: #1e3d08;
+    box-shadow: 0 4px 12px rgba(43, 88, 12, 0.15);
+}
+
+/* Forzar que el icono del calendario ocupe un buen tamaño */
+.input-calendario::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    border-radius: 4px;
+    margin-left: 10px;
+    filter: invert(26%) sepia(45%) saturate(930%) hue-rotate(54deg) brightness(96%) contrast(93%);
+    transform: scale(1.3);
+}
+
+/* ==========================================
+   5. DISEÑO DE LA PARRILLA DE HORAS
+   ========================================== */
+.grid-horas {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.btn-hora {
+    padding: 14px;
+    border: 2px solid #e0e0e0;
+    background: #ffffff;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.btn-hora:hover:not(:disabled) {
+    border-color: #2b580c;
+    background: #f4f9f0;
+}
+
+.btn-hora.seleccionado {
+    background: #2b580c;
+    color: #ffffff;
+    border-color: #2b580c;
+}
+
+/* Estado bloqueado cuando la franja está llena (5/5) */
+.btn-hora:disabled, .btn-hora.ocupado {
+    background: #f5f5f5;
+    color: #a0a0a0;
+    border-color: #e0e0e0;
+    cursor: not-allowed;
+    text-decoration: line-through;
+    opacity: 0.6;
+}
+
+.bloque-hora-manual {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px dashed #cccccc;
+}
+
+/* ==========================================
+   6. BOTONES DE SELECCIÓN GRANDE (Color/Blanco/Secado/Temp)
+   ========================================== */
+.grupo-botones-grandes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.btn-opcion {
+    padding: 20px;
+    border: 2px solid #e0e0e0;
+    background: #ffffff;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.btn-opcion:hover {
+    border-color: #2b580c;
+    background: #f9fbf8;
+}
+
+.btn-opcion.seleccionado {
+    background: #2b580c;
+    color: white;
+    border-color: #2b580c;
+}
+
+/* Grid específico para Temperaturas (4 botones) */
+.grid-temperaturas {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+/* ==========================================
+   7. NAVEGACIÓN ENTRE PASOS (Anterior / Siguiente)
+   ========================================== */
+.botones-navegacion {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 25px;
+    padding-top: 15px;
+    border-top: 1px solid #eef2f5;
+}
+
+.btn-nav {
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    font-size: 1rem;
+}
+
+.btn-anterior {
+    background: #e0e0e0;
+    color: #333333;
+}
+
+.btn-siguiente {
+    background: #2b580c;
+    color: white;
+}
+
+/* ==========================================
+   8. PANTALLA DE REVISIÓN FINAL
+   ========================================== */
+.resumen-ticket {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.fila-resumen {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.05rem;
+}
+
+.btn-imprimir-final {
+    background: #0056b3;
+    color: white;
+    padding: 16px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 15px;
+}
+
+/* ==========================================
+   9. OCULTAR TICKETS EN PANTALLA Y CONFIGURAR IMPRESIÓN
+   ========================================== */
+/* Los tickets reales NO se ven en el navegador mientras trabajas */
+.seccion-tickets {
+    display: none;
+}
+
+/* REGLAS DE IMPRESIÓN IMPRESORA TÉRMICA */
+@media print {
+    /* Ocultar toda la interfaz del navegador y asistente */
+    body * {
+        visibility: hidden;
+    }
+
+    /* Mostrar únicamente los tickets */
+    .seccion-tickets, .seccion-tickets * {
+        visibility: visible;
+        display: block !important;
+    }
+
+    .seccion-tickets {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 58mm; /* Ancho de la bobina de papel térmico */
+        margin: 0;
+        padding: 0;
+    }
+
+    .ticket-termico {
+        width: 100%;
+        font-family: 'Courier New', monospace;
+        font-size: 11px;
+        line-height: 1.3;
+        margin-bottom: 10mm;
+        page-break-after: always; /* Separa el ticket de cliente del de local */
+    }
+
+    .linea-ticket, .linea-destacada {
+        display: flex !important;
+        justify-content: space-between !important;
+    }
+
+    .separador {
+        border-top: 1px dashed #000;
+        margin: 5px 0;
+    }
+}
+
+/* ==========================================
+   10. ADAPTACIÓN RESPONSIVE (MÓVILES Y TABLETS)
+   ========================================== */
+
+/* Ajustes para pantallas pequeñas (Móviles de hasta 600px) */
+@media screen and (max-width: 600px) {
+    body {
+        padding: 10px; /* Reducimos márgenes en móvil */
+    }
+
+    .cabecera-fija {
+        flex-direction: column; /* Alinea el número de ticket y el título en vertical */
+        gap: 10px;
+        text-align: center;
+    }
+
+    .contenedor-asistente {
+        padding: 15px; /* Más espacio útil para el formulario */
+    }
+
+    /* La parrilla de horas pasa a 2 columnas para no apretar el texto */
+    .grid-horas {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+
+    /* Los botones de Ropa/Secado ocupan todo el ancho */
+    .grupo-botones-grandes {
+        grid-template-columns: 1fr;
+    }
+
+    /* Los botones de navegación (Siguiente/Anterior) en vertical */
+    .botones-navegacion {
+        flex-direction: column-reverse;
+        gap: 10px;
+    }
+
+    .btn-nav {
+        width: 100%; /* Botones grandes y fáciles de pulsar con el pulgar */
+        padding: 15px;
+    }
+}
